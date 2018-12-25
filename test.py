@@ -1,10 +1,13 @@
 import os
 import pandas as pd
+import numpy
 from os import listdir
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem import PorterStemmer
 
-path = "C:\\Users\\avevanes\\ohsumed-first-20000-docs"
+path = "D:\\documents\\users\\avevanes\\Downloads\\ohsumed-first-20000-docs"
+
+infoTable = []
 
 # declaration
 tokenize = []
@@ -17,9 +20,8 @@ testFileDirs = []
 trainData = []
 testData = []
 
-infoTable = []
 
-categoties = []
+# categoties = []
 docForCategory = []
 termsForCategory = []
 from nltk.corpus import stopwords
@@ -33,13 +35,18 @@ def cleanAndNormalizeText(data):
 
     # remove stop words
     filterText = [w for w in tokenize if not w in stop_words]
+    filterText = [w for w in filterText if not len(w) <= 1]
 
     # stem
     ps = PorterStemmer()
     for i in range(len(filterText)-1):
         if len(filterText[i]) > 1:
-             filterText[i] = ps.stem(filterText[i])
-    return filterText
+            try:
+                filterText[i] = ps.stem(filterText[i])
+            except Exception as e:
+                filterText[i] = filterText[i]
+
+    return ''.join(filterText)
 
 
 trainFolder = os.listdir(path+ '\\training')
@@ -62,5 +69,9 @@ for folder in testFolder:
         infoTable.append(['test',folder, file, Text])
 
 
-table = pd.DataFrame(infoTable, columns=['type','category','test','file'])
-table
+table = pd.DataFrame(infoTable, columns=['type','category','text','file'])
+print('Number of categories', numpy.unique(table['category'].size))
+
+
+docForCategory = pd.groupby(by='category', as_index=False).agg({'file': pd.Series.nunique})
+print(docForCategory)
