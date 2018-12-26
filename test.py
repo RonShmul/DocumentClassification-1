@@ -91,3 +91,5 @@ for cat in categories:
     plt.xlabel("number of files")
     plt.ylabel("number of terms")
     plt.show(his)
+
+
